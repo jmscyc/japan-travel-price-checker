@@ -434,6 +434,41 @@ const BasketOptimizer = {
     }
 
     this.calculateOptimalStore();
+  },
+
+  // 匯出採購清單與請款單 (可複製至 LINE 或下載成檔案)
+  exportPurchaseList() {
+    if (this.cartItems.length === 0) {
+      alert("目前購物車沒有任何商品，請先點擊「＋加品項」加入商品！");
+      return;
+    }
+
+    const rate = CurrencyManager.getRate();
+    let totalJpy = 0;
+    let listText = `🧾【出國血拚代購採購請款清單】\n(當前結算匯率: ${rate})\n-----------------------------\n`;
+
+    this.cartItems.forEach((item, idx) => {
+      const subtotalJpy = item.unitPriceJpy * item.qty;
+      const subtotalTwd = Math.round(subtotalJpy * rate);
+      totalJpy += subtotalJpy;
+      listText += `${idx + 1}. ${item.name}\n   數量: ${item.qty} | 單價: ¥${item.unitPriceJpy.toLocaleString()}\n   小計: ¥${subtotalJpy.toLocaleString()} (約 NT$ ${subtotalTwd.toLocaleString()})\n`;
+    });
+
+    const totalTwd = Math.round(totalJpy * rate);
+    listText += `-----------------------------\n`;
+    listText += `💰 總計金額: ¥${totalJpy.toLocaleString()} (約 NT$ ${totalTwd.toLocaleString()})\n`;
+    listText += `(以上為日圓定價換算，若有退稅或店內活動折扣依實付為準)\n`;
+
+    // 嘗試複製至剪貼簿
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(listText).then(() => {
+        alert("✅ 採購請款明細已成功複製到剪貼簿！可直接貼在 LINE 傳給親友！\n\n預覽：\n" + listText);
+      }).catch(() => {
+        prompt("請手動複製以下採購請款文字：", listText);
+      });
+    } else {
+      prompt("請手動複製以下採購請款文字：", listText);
+    }
   }
 };
 
