@@ -418,6 +418,15 @@ const CrossBorderComparator = {
     });
   },
 
+  // 快選信用卡回饋
+  setCardPreset(rate) {
+    const select = document.getElementById("cb-credit-cashback");
+    if (select) {
+      select.value = String(rate);
+      this.calculate();
+    }
+  },
+
   // 載入商品（從掃碼或選單）
   loadProduct(product) {
     this.currentProduct = JSON.parse(JSON.stringify(product));
@@ -753,6 +762,90 @@ const DomesticDrugComparator = {
 
   closePhotoViewer() {
     document.getElementById("photo-viewer-modal").classList.add("hidden");
+  },
+
+  // 當切換藥妝店家時，提供各大店家的含稅/未稅標示貼心提醒
+  handleStoreSelectChange(storeName) {
+    const tipEl = document.getElementById("store-tax-tip-text");
+    const taxCheck = document.getElementById("input-tax-included");
+    if (!tipEl) return;
+
+    if (storeName.includes("大國")) {
+      tipEl.textContent = "💡 大國藥妝：貨架上最醒目的通常為「未稅價」(紅色大字)，建議取消勾選含稅。";
+      if (taxCheck) taxCheck.checked = false;
+    } else if (storeName.includes("唐吉訶德")) {
+      tipEl.textContent = "💡 唐吉訶德：通常黑字為含稅價、紅字為未稅價，請留意輸入的數字！";
+    } else if (storeName.includes("松本清") || storeName.includes("Sundrug")) {
+      tipEl.textContent = "💡 松本清 / Sundrug：貨架大多同時標示含稅與未稅，請核對勾選。";
+    } else if (storeName.includes("Bic Camera")) {
+      tipEl.textContent = "💡 Bic Camera：通常標價為未稅價，結帳搭配旅客優惠券可享 10% + 5%~7% 折扣。";
+    } else {
+      tipEl.textContent = "💡 請確認貨架標籤是含稅(税込)還是未稅(税抜)，並切換右側勾選。";
+    }
+  },
+
+  // 匯出全部比價紀錄為 JSON (方便備份或分享給同行旅伴)
+  exportRecordsJSON() {
+    if (this.records.length === 0) {
+      alert("目前尚無任何比價記錄可匯出！");
+      return;
+    }
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.records, null, 2));
+    const dlAnchor = document.createElement("a");
+    const dateStr = new Date().toISOString().slice(0, 10);
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `japan_drug_prices_${dateStr}.json`);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+    alert("✅ 已成功匯出比價資料！可直接傳給同行旅伴透過「📥 匯入」同步！");
+  },
+
+  // 匯入同行旅伴的 JSON 紀錄
+  importRecordsJSON() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json,application/json";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (!Array.isArray(imported)) {
+            throw new Error("格式錯誤：必須是比價資料陣列");
+          }
+          if (confirm(`即將匯入 ${imported.length} 筆商品比價記錄，是否確認合併？`)) {
+            // 合併既有與匯入的商品
+            imported.forEach(newItem => {
+              const existingIdx = this.records.findIndex(r => r.barcode && r.barcode === newItem.barcode);
+              if (existingIdx >= 0) {
+                // 合併店家
+                const existing = this.records[existingIdx];
+                newItem.stores.forEach(ns => {
+                  if (!existing.stores.some(es => es.storeName === ns.storeName)) {
+                    existing.stores.push(ns);
+                  }
+                });
+              } else {
+                this.records.push(newItem);
+              }
+            });
+            this.saveRecords();
+            this.renderProductsList();
+            if (this.records.length > 0) {
+              this.selectProduct(this.records[0].id);
+            }
+            alert("🎉 匯入並合併成功！");
+          }
+        } catch (err) {
+          alert("⚠️ 匯入失敗，請確認檔案格式是否正確: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   },
 
   // 批次刪除與清空資料功能

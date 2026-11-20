@@ -28,6 +28,15 @@ const CrossBorderComparator = {
     });
   },
 
+  // 快選信用卡回饋
+  setCardPreset(rate) {
+    const select = document.getElementById("cb-credit-cashback");
+    if (select) {
+      select.value = String(rate);
+      this.calculate();
+    }
+  },
+
   // 載入商品（從掃碼或選單）
   loadProduct(product) {
     this.currentProduct = JSON.parse(JSON.stringify(product));
