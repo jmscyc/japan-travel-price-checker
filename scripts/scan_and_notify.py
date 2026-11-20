@@ -86,7 +86,7 @@ def check_quota_status(promo: dict, html_text: str = "") -> tuple[str, str]:
     if html_text:
         for kw in QUOTA_FULL_KEYWORDS:
             if kw in html_text:
-                return "FULL", f"⚠️ 偵測到官方網頁出現【{kw}】相關公告，名額已滿！"
+                return "FULL", f"⚠️ 偵測到官方網頁出現【{kw}】相關公告，名額已額滿！"
                 
     # 4. 若原先是 FULL，維持狀態
     if current_status == "FULL":

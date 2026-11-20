@@ -1,55 +1,72 @@
-# ✈️ 出國血拚即時比價助手 (GitHub Pages 部署指南)
+# 🍢 全台夜市 x 行動支付優惠即時通 (All-in-GitHub + Telegram)
 
-專為出國（日本）血拚打造的行動優先比價 Web App。支援手機瀏覽器、相機條碼掃描、跨國品牌比價、藥妝多店巡禮比價與即時活動優惠。
-
----
-
-## 🌟 核心特色功能
-
-1. **🌏 跨國比價 (台日對照 - UNIQLO / MUJI / 宜得利 等)**：
-   - 掃描標籤條碼或型號，自動調出日本原價與台灣專櫃售價。
-   - 支援計算 **退稅 10%**、**外國人額外折價券 (5%~10%)**、**信用卡海外回饋 (3%~4.5%)**。
-   - 即時計算活動後台幣入手價、與台灣官網價差百分比以及為你省下的金額。
-   - 提供台日官方搜尋直達連結，隨時查驗最新價格與尺寸貨量。
-
-2. **💊 日本藥妝多店巡禮比價 (唐吉訶德 / 松本清 / 大國 / Sundrug 等)**：
-   - 掃描藥妝條碼，自動帶出商品與照片。
-   - 逛到哪間店，直接點選店家並輸入日幣價格（含稅/未稅），秒速儲存。
-   - 自動生成 **「巡店價格紀錄總表」**，依未稅基準由低到高自動排序，一秒抓出誰是最低價冠軍！
-   - 即時換算台幣，標示現省金額。
-   - 頂部內建各大藥妝店最新折扣券與活動情報一覽，隨時點擊領券。
-
-3. **📱 行動裝置體驗優化**：
-   - 支援呼叫手機後置鏡頭秒掃條碼（支援 EAN-13、JAN、QR Code）。
-   - LocalStorage 本地儲存：藥妝店地下室訊號弱也能順暢記錄與查詢，不遺失數據。
-   - 支援加入手機主畫面（PWA 體驗）。
+專為台灣夜市吃喝愛好者設計的**行動支付優惠追蹤神器**！自動盤點各大行動支付（街口、台灣Pay、LINE Pay、全支付、悠遊付等）於各大夜市的最新回饋活動，並具備**即時額滿檢驗**與 **Telegram 自動警報通知**。
 
 ---
 
-## 🚀 部署至 GitHub Pages 步驟 (超簡單 3 分鐘)
+## 🌟 核心特色
 
-1. **建立 GitHub Repository**：
-   - 到 [GitHub.com](https://github.com) 登入並點擊 **New Repository**。
-   - 名稱可以取作 `japan-price-checker` 或任何你喜歡的名字，並設定為 **Public**。
+1. **📱 手機原生體驗 (GitHub Pages + PWA)**：
+   - 專為手機瀏覽設計，支援 iPhone / Android 「加入主畫面」，就像原生 App 一樣打開即用。
+   - 快速篩選夜市（寧夏、士林、逢甲、六合...）、支付方式（街口、台灣Pay、LINE Pay...）。
+   
+2. **⚠️ 獨家「名額額滿 / 提早結束」標籤**：
+   - 到夜市最怕看到回饋，結帳才發現預算已被搶光！
+   - 系統將狀態分為：
+     - 🟢 **尚有名額 (ACTIVE)**
+     - ⚠️ **已額滿 (FULL)**：標註官方額滿公告日期與警示，保留在清單中提醒使用者勿白跑。
+     - ⚪ **已結束 (EXPIRED)**：活動日期過期。
 
-2. **推動程式碼到 GitHub**：
-   在終端機執行：
-   ```bash
-   git add .
-   git commit -m "feat: initial commit for travel price checker"
-   git branch -M main
-   git remote add origin https://github.com/<你的GitHub帳號>/<你的Repo名稱>.git
-   git push -u origin main
-   ```
+3. **☁️ 0 伺服器、0 資料庫 (All-in-GitHub)**：
+   - 所有資料存放在 `data/promotions.json`。
+   - GitHub Actions 每日定時在雲端啟動爬蟲與狀態驗證，自動 commit 更新資料，你完全不需要開著電腦。
 
-3. **啟用 GitHub Pages**：
-   - 進入該 Repo 的 **Settings** -> 左側選單點擊 **Pages**。
-   - 在 **Build and deployment** 下的 **Branch**，選擇 `main` 分支與 `/(root)` 目錄，按 **Save**。
-   - 約 1 分鐘後，GitHub 會為你產生專屬網址：
-     `https://<你的GitHub帳號>.github.io/<你的Repo名稱>/`
+4. **📲 Telegram 即時推播**：
+   - 發現「全新夜市優惠」或活動「剛額滿」時，立即發送 Telegram 訊息到你的手機。
 
-4. **在手機上使用與加入主畫面**：
-   - 用手機 Safari (iPhone) 或 Chrome (Android) 打開該網址。
-   - **iPhone (Safari)**：點擊下方「分享」按鈕 -> 選擇「加入主畫面」。
-   - **Android (Chrome)**：點擊右上角「三個點」 -> 選擇「加到主畫面」或「安裝應用程式」。
-   - 完成後就像原生 App 一樣，出國打開點右下角「掃描條碼」立刻比價！
+---
+
+## 🚀 部署教學 (只需 3 分鐘)
+
+### 步驟 1：建立 Repository 並推動程式碼
+```bash
+git add .
+git commit -m "feat: Taiwan Night Market payment tracker"
+git branch -M main
+git remote add origin https://github.com/<你的GitHub帳號>/<你的Repo名稱>.git
+git push -u origin main
+```
+
+### 步驟 2：開啟 GitHub Pages (手機網址)
+1. 進入你的 GitHub Repo 頁面，點擊 **Settings** -> **Pages**。
+2. 在 **Branch** 選擇 `main`，資料夾選擇 `/(root)`，點擊 **Save**。
+3. 稍等約 1 分鐘，即可獲得手機專屬網址：
+   `https://<你的GitHub帳號>.github.io/<你的Repo名稱>/`
+4. **手機開啟**：
+   - **iPhone (Safari)**：點擊下方「分享」圖示 -> 選擇「加入主畫面」。
+   - **Android (Chrome)**：點擊右上角三點 -> 選擇「加到主畫面」。
+
+### 步驟 3：設定 Telegram 自動通知 (可選但推薦)
+1. 在 Telegram 搜尋 `@BotFather`，輸入 `/newbot` 建立機器人，取得 `HTTP API Token`。
+2. 搜尋 `@userinfobot` 傳送任何訊息，取得你的 `Id`（Chat ID）。
+3. 進入 GitHub Repo -> **Settings** -> **Secrets and variables** -> **Actions**，新增兩組 Repository secrets：
+   - `TELEGRAM_BOT_TOKEN`: 你的 Bot Token
+   - `TELEGRAM_CHAT_ID`: 你的 Chat ID
+4. 以後每次 GitHub Actions 跑完，一旦有夜市活動額滿或新增活動，你的 Telegram 就會立刻收到警報！
+
+---
+
+## 🛠️ 本地測試與執行
+
+- **執行掃描與額滿驗證腳本**：
+  ```bash
+  python3 scripts/scan_and_notify.py
+  ```
+- **執行單元測試**：
+  ```bash
+  python3 -m unittest tests/test_scanner.py
+  ```
+- **本機啟動網頁預覽**：
+  ```bash
+  python3 -m http.server 8000
+  ```

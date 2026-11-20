@@ -10,11 +10,11 @@
     "start_date": "2026-11-01",
     "end_date": "2026-12-15",
     "status": "ACTIVE",
-    "status_note": "尚有名額，總預算 50 萬元送完為止",
+    "status_note": "尚有名額，進行中",
     "rules_summary": "使用台灣 Pay (金融卡/帳戶) 於士林夜市指定張貼店家出示條碼或掃碼支付，單筆消費享 20% 現金回饋，每人每卡活動期間最高回饋 300 元。",
     "source_url": "https://www.taiwanpay.com.tw",
     "quota_check_url": "https://www.taiwanpay.com.tw",
-    "last_checked": "2026-11-20T12:00:00Z"
+    "last_checked": "2026-11-20T13:09:53Z"
   },
   {
     "id": "jkopay_202611_ningxia",
@@ -31,7 +31,7 @@
     "rules_summary": "於寧夏夜市街口指定攤位掃碼付款，每筆最高享 15% 街口幣回饋，每人每週限回饋 2 次。",
     "source_url": "https://www.jkopay.com",
     "quota_check_url": "https://www.jkopay.com",
-    "last_checked": "2026-11-20T12:00:00Z"
+    "last_checked": "2026-11-20T13:09:54Z"
   },
   {
     "id": "linepay_202611_fengjia",
@@ -44,11 +44,11 @@
     "start_date": "2026-11-10",
     "end_date": "2026-12-10",
     "status": "ACTIVE",
-    "status_note": "本週優惠券開放領取中，每日限額 1,000 張",
+    "status_note": "尚有名額，進行中",
     "rules_summary": "於 LINE Pay 好康地圖領取逢甲夜市專屬優惠券，至逢甲合作店家單筆滿 100 元即可現折 20 元。",
     "source_url": "https://pay.line.me/tw",
     "quota_check_url": "https://pay.line.me/tw",
-    "last_checked": "2026-11-20T12:00:00Z"
+    "last_checked": "2026-11-20T13:09:55Z"
   },
   {
     "id": "easycard_202611_raohe",
@@ -65,7 +65,7 @@
     "rules_summary": "活動期間於饒河夜市指定悠遊付店家使用悠遊付錢包/綁定銀行帳戶扣款，滿 100 元享回饋。",
     "source_url": "https://www.easycard.com.tw",
     "quota_check_url": "https://www.easycard.com.tw",
-    "last_checked": "2026-11-20T12:00:00Z"
+    "last_checked": "2026-11-20T13:09:55Z"
   },
   {
     "id": "pxpayplus_202611_liouhe",
@@ -78,11 +78,11 @@
     "start_date": "2026-11-15",
     "end_date": "2026-12-31",
     "status": "ACTIVE",
-    "status_note": "名額尚充裕",
+    "status_note": "尚有名額，進行中",
     "rules_summary": "使用全支付綁定指定銀行帳戶於六合夜市店家掃碼消費，筆筆享 15% 全點回饋（1點=1元），每月每會員最高 100 點。",
     "source_url": "https://www.pxpayplus.com",
     "quota_check_url": "https://www.pxpayplus.com",
-    "last_checked": "2026-11-20T12:00:00Z"
+    "last_checked": "2026-11-20T13:09:55Z"
   },
   {
     "id": "taiwanpay_202611_dongdamen",
@@ -95,11 +95,11 @@
     "start_date": "2026-11-01",
     "end_date": "2026-12-31",
     "status": "ACTIVE",
-    "status_note": "振興專案預算充裕進行中",
+    "status_note": "尚有名額，進行中",
     "rules_summary": "配合振興花蓮方案，東大門原住民一條街、福町夜市等各攤位使用台灣 Pay QR Code 支付，享 20% 現金回饋。",
     "source_url": "https://www.taiwanpay.com.tw",
     "quota_check_url": "https://www.taiwanpay.com.tw",
-    "last_checked": "2026-11-20T12:00:00Z"
+    "last_checked": "2026-11-20T13:09:55Z"
   },
   {
     "id": "icashpay_202611_lehua",
@@ -112,10 +112,10 @@
     "start_date": "2026-11-01",
     "end_date": "2026-11-15",
     "status": "EXPIRED",
-    "status_note": "活動已於 11/15 自然截止",
+    "status_note": "活動已於 2026-11-15 自然截止",
     "rules_summary": "使用 icash Pay 綁定指定信用卡於樂華夜市消費滿百享 10% OPENPOINT 回饋。",
     "source_url": "https://www.icashpay.com.tw",
     "quota_check_url": "https://www.icashpay.com.tw",
-    "last_checked": "2026-11-20T12:00:00Z"
+    "last_checked": "2026-11-20T13:09:55Z"
   }
 ]
