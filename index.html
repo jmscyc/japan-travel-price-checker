@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>出國血拚即時比價助手 (跨國 & 日本藥妝)</title>
-  <meta name="description" content="出國日本血拚必備：UNIQLO、無印良品、宜得利跨國比價；日本各大藥妝多店價格記錄比價、自動彙整折價券活動！">
+  <title>出國血拚即時比價助手 (跨國 & 日本藥妝 & 總額神省試算)</title>
+  <meta name="description" content="出國日本血拚必備：UNIQLO、無印良品、宜得利跨國比價；日本各大藥妝多店價格記錄比價；自動依購物總額推薦最佳優惠店家！">
   <meta name="theme-color" content="#4f46e5">
 
   <!-- Tailwind CSS CDN -->
@@ -13,7 +13,6 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <style>
-    /* 針對手機 Safe Area 與全螢幕微調 */
     body {
       -webkit-tap-highlight-color: transparent;
       padding-bottom: env(safe-area-inset-bottom);
@@ -36,7 +35,7 @@
         <span class="text-xl">✈️</span>
         <div>
           <h1 class="text-base font-bold leading-tight">出國即時比價助手</h1>
-          <p class="text-[10px] text-indigo-200">跨國品牌 & 藥妝多店速比</p>
+          <p class="text-[10px] text-indigo-200">跨國品牌 · 藥妝多店 · 最佳店家算盤</p>
         </div>
       </div>
       
@@ -51,20 +50,24 @@
       </div>
     </div>
 
-    <!-- 模式分頁 Tabs -->
-    <div class="max-w-md mx-auto grid grid-cols-2 text-center text-xs font-medium border-t border-indigo-500/50 bg-indigo-700/40">
+    <!-- 模式分頁 Tabs (3 大核心模組) -->
+    <div class="max-w-md mx-auto grid grid-cols-3 text-center text-xs font-medium border-t border-indigo-500/50 bg-indigo-700/40">
       <button id="tab-cross-border" class="py-2.5 border-b-2 border-white text-white font-bold flex items-center justify-center space-x-1 transition">
         <span>🌏</span>
-        <span>跨國比價 (台日對照)</span>
+        <span>跨國比價</span>
       </button>
       <button id="tab-domestic-drug" class="py-2.5 border-b-2 border-transparent text-indigo-200 hover:text-white flex items-center justify-center space-x-1 transition">
         <span>💊</span>
-        <span>日本藥妝 (多店記錄)</span>
+        <span>藥妝多店</span>
+      </button>
+      <button id="tab-optimizer" class="py-2.5 border-b-2 border-transparent text-indigo-200 hover:text-white flex items-center justify-center space-x-1 transition">
+        <span>🛒</span>
+        <span>最佳店家試算</span>
       </button>
     </div>
   </header>
 
-  <!-- 懸浮快速掃碼按鈕 (固定右下角，隨時能按) -->
+  <!-- 懸浮快速掃碼按鈕 (固定右下角) -->
   <div class="fixed bottom-6 right-5 z-40">
     <button id="btn-open-scanner" class="flex items-center space-x-1.5 bg-gradient-to-r from-rose-500 to-pink-600 text-white px-4 py-3 rounded-full shadow-xl hover:shadow-2xl active:scale-95 transition transform border-2 border-white">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,6 +405,105 @@
 
     </section>
 
+    <!-- ============================================== -->
+    <!-- VIEW 3: 依購買總金額推薦最佳優惠店家 (新功能) -->
+    <!-- ============================================== -->
+    <section id="view-optimizer" class="hidden space-y-4">
+      
+      <!-- 總額試算輸入區 -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-base">🧮</span>
+            <h3 class="text-sm font-bold text-slate-800">總金額最佳店家算盤</h3>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold">智能滿額階梯</span>
+        </div>
+
+        <p class="text-xs text-slate-500 leading-relaxed">
+          輸入預計購買總日圓，或使用下方欲購清單，系統自動計算 <strong>退稅 10% + 各店滿額折價券 (3%~8%)</strong>，找出哪間店買最划算！
+        </p>
+
+        <!-- 快速自訂總預算輸入 -->
+        <div>
+          <label class="text-[11px] font-bold text-slate-700 block mb-1">快速輸入預算總額 (JPY):</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold">¥</span>
+            <input id="cart-custom-budget" type="number" placeholder="例如: 12000 或 35000" class="w-full pl-8 pr-4 py-2 text-sm font-black rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 bg-slate-50/50">
+          </div>
+          <div class="flex space-x-1.5 mt-2 overflow-x-auto hide-scrollbar">
+            <button onclick="document.getElementById('cart-custom-budget').value=5500; BasketOptimizer.calculateOptimalStore()" class="px-2.5 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 rounded-lg font-medium text-slate-700 flex-shrink-0">¥5,500 (微過免稅)</button>
+            <button onclick="document.getElementById('cart-custom-budget').value=12000; BasketOptimizer.calculateOptimalStore()" class="px-2.5 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 rounded-lg font-medium text-slate-700 flex-shrink-0">¥12,000 (啟動滿萬折)</button>
+            <button onclick="document.getElementById('cart-custom-budget').value=32000; BasketOptimizer.calculateOptimalStore()" class="px-2.5 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 rounded-lg font-medium text-slate-700 flex-shrink-0">¥32,000 (滿3萬高折)</button>
+            <button onclick="document.getElementById('cart-custom-budget').value=55000; BasketOptimizer.calculateOptimalStore()" class="px-2.5 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 rounded-lg font-medium text-slate-700 flex-shrink-0">¥55,000 (頂規7~8%)</button>
+          </div>
+        </div>
+
+        <!-- 免稅門檻進度條 (5,000 円) -->
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-700 flex items-center">
+              <span>🎌</span>
+              <span class="ml-1">日本免稅 5,000 円進度條</span>
+            </span>
+            <span id="taxfree-tag" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+              計算中
+            </span>
+          </div>
+
+          <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+            <div id="taxfree-progress-bar" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+
+          <div id="taxfree-status-text" class="text-[11px] text-slate-600">
+            消費滿 5,000 日圓可享受 10% 免稅優惠
+          </div>
+        </div>
+
+        <!-- 購物車清單總結標頭 -->
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+          <div>
+            <span class="text-[11px] text-slate-500 block">目前試算總基準額</span>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="cart-total-jpy" class="text-lg font-black text-slate-900">¥0</span>
+              <span id="cart-total-twd" class="text-xs text-slate-500 font-medium">約 NT$ 0</span>
+            </div>
+          </div>
+          <div class="flex space-x-1.5">
+            <button id="btn-add-sample-to-cart" class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg hover:bg-indigo-100">
+              ＋加品項
+            </button>
+            <button id="btn-clear-cart" class="px-2 py-1 text-slate-400 hover:text-rose-500 text-xs">
+              清空
+            </button>
+          </div>
+        </div>
+
+        <!-- 購物車品項列表 -->
+        <div id="cart-items-list" class="space-y-1.5 max-h-48 overflow-y-auto">
+          <!-- 由 JS 渲染 -->
+        </div>
+      </div>
+
+      <!-- 最佳店家冠軍 Banner -->
+      <div id="optimizer-winner-banner" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-white rounded-2xl p-4 shadow-md space-y-1">
+        <!-- 由 JS 渲染 -->
+      </div>
+
+      <!-- 全連鎖店比價排名前瞻 -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between px-1">
+          <span class="text-xs font-bold text-slate-700">各店實付金額排行榜 (由省到貴)</span>
+          <span class="text-[10px] text-slate-400">已扣除免稅與折價券</span>
+        </div>
+        
+        <div id="optimizer-rankings-container" class="space-y-2.5">
+          <!-- 由 JS 渲染排行榜卡片 -->
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
   <!-- ============================================== -->
@@ -471,6 +573,7 @@
   <script src="js/currency.js"></script>
   <script src="js/crossBorder.js"></script>
   <script src="js/domesticDrug.js"></script>
+  <script src="js/basketOptimizer.js"></script>
   <script src="js/scanner.js"></script>
   <script src="js/app.js"></script>
 

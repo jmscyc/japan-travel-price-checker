@@ -1,6 +1,6 @@
 // 應用程式核心控制器
 const App = {
-  currentTab: "cross-border", // "cross-border" | "domestic-drug"
+  currentTab: "cross-border", // "cross-border" | "domestic-drug" | "optimizer"
 
   init() {
     this.initRateHeader();
@@ -11,6 +11,7 @@ const App = {
     BarcodeScannerManager.init();
     CrossBorderComparator.init();
     DomesticDrugComparator.init();
+    BasketOptimizer.init();
 
     // 預設載入一筆跨國商品
     if (window.SAMPLE_PRODUCTS && window.SAMPLE_PRODUCTS.length > 0) {
@@ -46,6 +47,7 @@ const App = {
           if (DomesticDrugComparator.selectedProductId) {
             DomesticDrugComparator.renderComparisonDetail(DomesticDrugComparator.selectedProductId);
           }
+          BasketOptimizer.calculateOptimalStore();
         }
       });
     }
@@ -60,42 +62,49 @@ const App = {
         if (DomesticDrugComparator.selectedProductId) {
           DomesticDrugComparator.renderComparisonDetail(DomesticDrugComparator.selectedProductId);
         }
+        BasketOptimizer.calculateOptimalStore();
       });
     }
   },
 
-  // Tab 切換
+  // 3 大 Tab 切換
   initTabs() {
     const tabCb = document.getElementById("tab-cross-border");
     const tabDrug = document.getElementById("tab-domestic-drug");
+    const tabOpt = document.getElementById("tab-optimizer");
+
     const viewCb = document.getElementById("view-cross-border");
     const viewDrug = document.getElementById("view-domestic-drug");
+    const viewOpt = document.getElementById("view-optimizer");
 
-    const switchTab = (tab) => {
-      this.currentTab = tab;
-      if (tab === "cross-border") {
-        tabCb.classList.add("text-indigo-600", "border-indigo-600", "font-bold");
-        tabCb.classList.remove("text-gray-500", "border-transparent");
-        tabDrug.classList.remove("text-indigo-600", "border-indigo-600", "font-bold");
-        tabDrug.classList.add("text-gray-500", "border-transparent");
+    const tabs = [
+      { id: "cross-border", btn: tabCb, view: viewCb },
+      { id: "domestic-drug", btn: tabDrug, view: viewDrug },
+      { id: "optimizer", btn: tabOpt, view: viewOpt }
+    ];
 
-        viewCb.classList.remove("hidden");
-        viewDrug.classList.add("hidden");
-      } else {
-        tabDrug.classList.add("text-indigo-600", "border-indigo-600", "font-bold");
-        tabDrug.classList.remove("text-gray-500", "border-transparent");
-        tabCb.classList.remove("text-indigo-600", "border-indigo-600", "font-bold");
-        tabCb.classList.add("text-gray-500", "border-transparent");
+    const switchTab = (targetId) => {
+      this.currentTab = targetId;
+      tabs.forEach(t => {
+        if (t.id === targetId) {
+          t.btn.classList.add("text-white", "border-white", "font-bold");
+          t.btn.classList.remove("text-indigo-200", "border-transparent");
+          t.view.classList.remove("hidden");
+        } else {
+          t.btn.classList.remove("text-white", "border-white", "font-bold");
+          t.btn.classList.add("text-indigo-200", "border-transparent");
+          t.view.classList.add("hidden");
+        }
+      });
 
-        viewDrug.classList.remove("hidden");
-        viewCb.classList.add("hidden");
+      if (targetId === "optimizer") {
+        BasketOptimizer.calculateOptimalStore();
       }
     };
 
-    if (tabCb && tabDrug) {
-      tabCb.addEventListener("click", () => switchTab("cross-border"));
-      tabDrug.addEventListener("click", () => switchTab("domestic-drug"));
-    }
+    if (tabCb) tabCb.addEventListener("click", () => switchTab("cross-border"));
+    if (tabDrug) tabDrug.addEventListener("click", () => switchTab("domestic-drug"));
+    if (tabOpt) tabOpt.addEventListener("click", () => switchTab("optimizer"));
   },
 
   // 跨國比價快速選擇示範商品
