@@ -370,8 +370,8 @@ const BasketOptimizer = {
 
           <!-- 折扣明細與標籤 -->
           <div class="flex flex-wrap gap-1.5 pt-1 text-[10px]">
-            <span class="px-2 py-0.5 rounded ${res.isTaxEligible !== false ? 'bg-emerald-100 text-emerald-800 font-semibold' : 'bg-slate-100 text-slate-500'}">
-              ${res.baseTotal >= 5000 ? '✅ 享免稅 10%' : '⚠️ 未達 5,000円免稅'}
+            <span class="px-2 py-0.5 rounded ${res.isTaxFreeEligible ? 'bg-emerald-100 text-emerald-800 font-semibold' : 'bg-slate-100 text-slate-500'}">
+              ${res.isTaxFreeEligible ? '✅ 享免稅 10%' : '⚠️ 未達 5,000円免稅'}
             </span>
 
             ${res.bestTier ? `

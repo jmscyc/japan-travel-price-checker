@@ -11,6 +11,21 @@ const CrossBorderComparator = {
     if (applyBtn) {
       applyBtn.addEventListener("click", () => this.calculate());
     }
+
+    // 當使用者在任何欄位打字或切換選項時，即時自動重新計算比價
+    const autoInputs = [
+      "cb-jp-orig-price", "cb-jp-campaign-price",
+      "cb-tw-orig-price", "cb-tw-campaign-price",
+      "cb-tax-free-check", "cb-extra-coupon", "cb-credit-cashback"
+    ];
+
+    autoInputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("input", () => this.calculate());
+        el.addEventListener("change", () => this.calculate());
+      }
+    });
   },
 
   // 載入商品（從掃碼或選單）

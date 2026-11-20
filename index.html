@@ -7,10 +7,23 @@
   <meta name="description" content="出國日本血拚必備：UNIQLO、無印良品、宜得利跨國比價；日本各大藥妝多店價格記錄比價；自動依購物總額推薦最佳優惠店家！">
   <meta name="theme-color" content="#4f46e5">
 
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081840.png">
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- html5-qrcode 條碼掃描庫 -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <script>
+    // 註冊 Service Worker 實現無網路/地下室離線訪問
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW register fail:', err));
+      });
+    }
+  </script>
 
   <style>
     body {

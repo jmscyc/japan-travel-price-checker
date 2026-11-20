@@ -115,9 +115,27 @@ const BarcodeScannerManager = {
         };
         CrossBorderComparator.loadProduct(customProd);
       }
-    } else {
+    } else if (currentTab === "domestic-drug") {
       // 日本藥妝比價
       DomesticDrugComparator.handleScannedBarcode(barcode);
+    } else if (currentTab === "optimizer") {
+      // 總額最佳試算：直接將掃描商品加入購物清單
+      const sample = window.SAMPLE_PRODUCTS ? window.SAMPLE_PRODUCTS.find(p => p.barcode === barcode || p.code === barcode) : null;
+      const itemName = sample ? sample.name : `掃碼商品 (${barcode})`;
+      const itemPrice = sample ? (sample.jpDiscountPrice || sample.jpPrice || 1500) : 1500;
+      const itemImg = sample ? sample.image : "https://placehold.co/200x200?text=掃碼品";
+
+      BasketOptimizer.cartItems.push({
+        id: "item_" + Date.now(),
+        productId: barcode,
+        name: itemName,
+        qty: 1,
+        unitPriceJpy: itemPrice,
+        image: itemImg
+      });
+      BasketOptimizer.saveCart();
+      BasketOptimizer.renderCartUI();
+      alert(`已將「${itemName}」加入購物清單！`);
     }
   }
 };
