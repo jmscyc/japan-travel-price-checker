@@ -1663,7 +1663,7 @@ const App = {
       { id: "optimizer", btn: tabOpt, view: viewOpt }
     ];
 
-    const switchTab = (targetId) => {
+    this.switchTab = (targetId) => {
       this.currentTab = targetId;
       tabs.forEach(t => {
         if (t.id === targetId) {
@@ -1682,9 +1682,9 @@ const App = {
       }
     };
 
-    if (tabCb) tabCb.addEventListener("click", () => switchTab("cross-border"));
-    if (tabDrug) tabDrug.addEventListener("click", () => switchTab("domestic-drug"));
-    if (tabOpt) tabOpt.addEventListener("click", () => switchTab("optimizer"));
+    if (tabCb) tabCb.addEventListener("click", () => this.switchTab("cross-border"));
+    if (tabDrug) tabDrug.addEventListener("click", () => this.switchTab("domestic-drug"));
+    if (tabOpt) tabOpt.addEventListener("click", () => this.switchTab("optimizer"));
   },
 
   // 跨國比價快速選擇示範商品
