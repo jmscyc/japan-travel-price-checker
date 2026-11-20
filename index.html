@@ -288,10 +288,32 @@
       <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-bold text-slate-700">已記錄比價商品：</span>
-          <button id="btn-create-drug-prod" class="text-xs text-rose-600 font-bold hover:underline flex items-center">
-            ＋ 手動新增商品
-          </button>
+          <div class="flex items-center space-x-2">
+            <button id="btn-batch-manage" onclick="DomesticDrugComparator.toggleBatchMode()" class="text-xs text-slate-600 font-medium hover:text-indigo-600 flex items-center">
+              🗑️ 批次刪除
+            </button>
+            <button id="btn-create-drug-prod" class="text-xs text-rose-600 font-bold hover:underline flex items-center">
+              ＋ 手動新增
+            </button>
+          </div>
         </div>
+
+        <!-- 批次管理工具列 (預設隱藏) -->
+        <div id="batch-delete-bar" class="hidden mb-2 p-2 bg-rose-50 border border-rose-200 rounded-lg flex items-center justify-between text-xs">
+          <span class="text-rose-700 font-medium">勾選欲刪除的商品</span>
+          <div class="flex items-center space-x-2">
+            <button onclick="DomesticDrugComparator.executeBatchDelete()" class="px-2.5 py-1 bg-rose-600 text-white rounded font-bold hover:bg-rose-700 shadow-2xs">
+              確認刪除選中
+            </button>
+            <button onclick="DomesticDrugComparator.clearAllRecords()" class="px-2 py-1 text-rose-600 hover:underline">
+              全部清空
+            </button>
+            <button onclick="DomesticDrugComparator.toggleBatchMode(false)" class="px-2 py-1 text-slate-500 hover:text-slate-800">
+              取消
+            </button>
+          </div>
+        </div>
+
         <div id="drug-prod-chips" class="flex space-x-2 overflow-x-auto hide-scrollbar py-0.5">
           <!-- 由 JS 渲染 -->
         </div>
@@ -408,6 +430,21 @@
               <input id="input-store-note" type="text" placeholder="例: 限購2瓶 / 滿三萬再折5% / 贈送試用品" class="w-full mt-0.5 px-2.5 py-1 text-xs rounded-lg border border-slate-300 bg-white">
             </div>
 
+            <!-- 📷 拍貨架標籤照片按鈕與預覽 -->
+            <div class="pt-1">
+              <input type="file" id="input-shelf-photo" accept="image/*" capture="environment" class="hidden" onchange="DomesticDrugComparator.handleShelfPhotoSelected(this)">
+              <div class="flex items-center space-x-2">
+                <button type="button" onclick="document.getElementById('input-shelf-photo').click()" class="flex-1 py-1.5 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 flex items-center justify-center space-x-1.5 transition">
+                  <span>📷</span>
+                  <span id="shelf-photo-label">拍貨架標籤 (存證防混淆)</span>
+                </button>
+                <div id="shelf-photo-preview-wrap" class="hidden relative">
+                  <img id="shelf-photo-thumb" src="" class="w-8 h-8 rounded border border-slate-300 object-cover cursor-pointer" onclick="DomesticDrugComparator.viewPhoto(this.src)">
+                  <button type="button" onclick="DomesticDrugComparator.clearSelectedPhoto()" class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-rose-600 text-white text-[9px] flex items-center justify-center">✕</button>
+                </div>
+              </div>
+            </div>
+
             <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-xs font-bold rounded-xl shadow-sm transition">
               儲存此店價格並加入比價
             </button>
@@ -417,6 +454,17 @@
       </div>
 
     </section>
+
+    <!-- 照片檢視放大視窗 Modal -->
+    <div id="photo-viewer-modal" class="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 hidden backdrop-blur-xs" onclick="DomesticDrugComparator.closePhotoViewer()">
+      <div class="relative max-w-sm w-full bg-slate-900 rounded-2xl overflow-hidden shadow-2xl p-2 border border-slate-700">
+        <div class="flex items-center justify-between pb-2 px-2 text-white">
+          <span class="text-xs font-bold">貨架標籤照片存證</span>
+          <button class="text-slate-400 hover:text-white text-base font-bold">✕</button>
+        </div>
+        <img id="photo-viewer-img" src="" class="w-full max-h-[70vh] object-contain rounded-lg">
+      </div>
+    </div>
 
     <!-- ============================================== -->
     <!-- VIEW 3: 依購買總金額推薦最佳優惠店家 (新功能) -->
