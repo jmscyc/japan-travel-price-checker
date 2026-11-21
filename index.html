@@ -61,6 +61,11 @@
         <button id="btn-edit-rate" title="自訂換算匯率" class="text-xs hover:text-white transition">✏️</button>
         <input type="hidden" id="header-rate-input" value="0.215">
       </div>
+
+      <!-- Google Sheet 雲端同步按鈕 -->
+      <button onclick="GoogleSheetSync.openModal()" class="flex items-center space-x-1 bg-indigo-700/80 hover:bg-indigo-800 px-2 py-1 rounded-full text-xs transition border border-indigo-500/40" title="Google Sheet 雲端同步設定">
+        <span id="header-gsheet-indicator" class="text-[10px] text-indigo-200 hover:underline flex items-center gap-0.5">☁️ 雲端同步</span>
+      </button>
     </div>
 
     <!-- 模式分頁 Tabs (3 大核心模組) -->
@@ -343,6 +348,9 @@
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-bold text-slate-700">已記錄比價商品：</span>
           <div class="flex items-center space-x-2">
+            <button onclick="GoogleSheetSync.openModal()" class="text-xs text-indigo-700 font-bold hover:underline flex items-center gap-0.5 bg-indigo-50 px-2 py-0.5 rounded" title="與 Google 試算表同步備份">
+              ☁️ Sheet 同步
+            </button>
             <button onclick="DomesticDrugComparator.exportRecordsJSON()" class="text-xs text-slate-600 font-medium hover:text-indigo-600 flex items-center" title="備份或分享給同行旅伴">
               📤 備份
             </button>
@@ -749,9 +757,77 @@
     </div>
   </div>
 
+  <!-- ============================================== -->
+  <!-- Google Sheet 雲端同步與權限設定 Modal -->
+  <!-- ============================================== -->
+  <div id="gsheet-modal" class="fixed inset-0 z-50 bg-black/75 flex flex-col items-center justify-center p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl w-full max-w-sm max-h-[88vh] overflow-y-auto shadow-2xl p-4 space-y-3.5">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center">
+          <span class="mr-1.5">📊</span> Google Sheet 雲端同步
+        </h3>
+        <button onclick="GoogleSheetSync.closeModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-2">✕</button>
+      </div>
+
+      <!-- 狀態列 -->
+      <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+        <div>
+          <span class="text-[10px] text-slate-500 block">連線狀態</span>
+          <span id="gsheet-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-600">未綁定 Google Sheet</span>
+        </div>
+        <span id="gsheet-last-sync-time" class="text-[10px] text-slate-400">尚未同步</span>
+      </div>
+
+      <!-- 網址輸入區 -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-700 block">您的 Google Web App 網址：</label>
+        <input id="gsheet-url-input" type="url" placeholder="https://script.google.com/macros/s/..." class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500">
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center space-x-1.5 text-xs text-slate-600 cursor-pointer">
+            <input id="gsheet-auto-sync-check" type="checkbox" class="rounded text-indigo-600">
+            <span>記帳時自動背景同步</span>
+          </label>
+          <button onclick="GoogleSheetSync.saveSettings()" class="text-xs text-indigo-600 font-bold hover:underline">儲存網址</button>
+        </div>
+      </div>
+
+      <!-- 操作按鈕 -->
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="GoogleSheetSync.uploadToGoogleSheet()" class="py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl font-bold text-xs hover:from-indigo-700 hover:to-indigo-800 shadow-sm flex items-center justify-center gap-1">
+          <span>📤</span> 備份至 Sheet
+        </button>
+        <button onclick="GoogleSheetSync.downloadFromGoogleSheet()" class="py-2.5 bg-white border border-indigo-200 text-indigo-700 rounded-xl font-bold text-xs hover:bg-indigo-50 shadow-2xs flex items-center justify-center gap-1">
+          <span>📥</span> 從雲端還原
+        </button>
+      </div>
+
+      <!-- 30 秒簡易設定教學 -->
+      <div class="bg-amber-50 rounded-xl p-3 border border-amber-200 space-y-2 text-xs text-amber-900">
+        <div class="flex items-center justify-between">
+          <span class="font-bold flex items-center">
+            <span class="mr-1">💡</span> 3 步驟免費建立您專屬的 Sheet：
+          </span>
+          <button onclick="GoogleSheetSync.copyScriptTemplate()" class="px-2 py-0.5 bg-amber-600 text-white rounded text-[10px] font-bold hover:bg-amber-700">
+            📋 複製腳本
+          </button>
+        </div>
+        <ol class="space-y-1 text-[11px] list-decimal list-inside leading-relaxed text-amber-800">
+          <li>建立新的 <b>Google 試算表</b>，點擊選單「<b>擴充功能 ➔ Apps Script</b>」。</li>
+          <li>清空既有內容，點擊上方「📋 複製腳本」貼上。</li>
+          <li>點右上角「<b>部署 ➔ 新增部署作業</b>」，類型選「<b>網頁應用程式</b>」，存取權選「<b>任何人 (Anyone)</b>」，將產生的網址貼至上方輸入框即可！</li>
+        </ol>
+      </div>
+
+      <button onclick="GoogleSheetSync.closeModal()" class="w-full py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs hover:bg-slate-200">
+        關閉視窗
+      </button>
+    </div>
+  </div>
+
   <!-- JavaScript 模組 -->
   <script src="js/mockData.js"></script>
   <script src="js/currency.js"></script>
+  <script src="js/googleSheetSync.js"></script>
   <script src="js/crossBorder.js"></script>
   <script src="js/domesticDrug.js"></script>
   <script src="js/basketOptimizer.js"></script>

@@ -12,6 +12,9 @@ const App = {
     CrossBorderComparator.init();
     DomesticDrugComparator.init();
     BasketOptimizer.init();
+    if (window.GoogleSheetSync) {
+      GoogleSheetSync.init();
+    }
 
     // 預設載入一筆跨國商品
     if (window.SAMPLE_PRODUCTS && window.SAMPLE_PRODUCTS.length > 0) {

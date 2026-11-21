@@ -248,6 +248,29 @@ sandbox.BasketOptimizer.cartItems = [
 sandbox.BasketOptimizer.exportPurchaseList();
 assert(clipboardContent.includes('出國血拚代購採購請款清單') && clipboardContent.includes('NT$'), '代購請款清單格式化並複製至剪貼簿成功');
 
+// ==========================================
+// 測試模組 6: Google Sheet 雲端同步與權限模組
+// ==========================================
+console.log('\n---【模組 6: Google Sheet 雲端同步與權限】---');
+assert(sandbox.GoogleSheetSync !== undefined, 'GoogleSheetSync 模組成功載入');
+
+// 測試 Web App URL 儲存與狀態指示更新
+const testUrl = 'https://script.google.com/macros/s/AKfycbxTest/exec';
+sandbox.GoogleSheetSync.setWebAppUrl(testUrl);
+assert(sandbox.GoogleSheetSync.getWebAppUrl() === testUrl, '成功儲存 Google Web App 網址');
+assert(sandbox.document.getElementById('gsheet-status-badge').textContent.includes('已連線'), '狀態標籤更新為已連線');
+
+// 測試試算表資料序列化格式 (格式化為漂亮的試算表列)
+const sheetPayload = sandbox.GoogleSheetSync.formatDataForSheet();
+assert(sheetPayload.rows && sheetPayload.rows.length > 0, '成功將比價紀錄轉換為試算表資料列');
+assert(sheetPayload.rows[0].productName !== undefined, '資料列包含商品名稱欄位');
+assert(sheetPayload.rows[0].priceTwd !== undefined, '資料列自動計算並包含折合台幣欄位');
+assert(sheetPayload.rawRecords && sheetPayload.rawRecords.length > 0, '包含無損完整備份 rawRecords 供跨裝置還原');
+
+// 測試自動同步開關設定
+sandbox.GoogleSheetSync.setAutoSync(true);
+assert(sandbox.GoogleSheetSync.isAutoSyncEnabled() === true, '自動背景同步開關設定成功');
+
 console.log('\n==============================================');
 console.log(`🎉 測試完成: 通過 ${passCount} 項 / 失敗 ${failCount} 項`);
 console.log('==============================================');

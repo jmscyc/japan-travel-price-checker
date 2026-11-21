@@ -168,6 +168,10 @@ const DomesticDrugComparator = {
     }
 
     this.saveRecords();
+    if (window.GoogleSheetSync) {
+      window.GoogleSheetSync.triggerAutoSync();
+    }
+
     document.getElementById("input-store-price").value = "";
     document.getElementById("input-custom-store").value = "";
     document.getElementById("input-store-note").value = "";
