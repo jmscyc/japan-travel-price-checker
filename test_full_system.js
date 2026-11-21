@@ -151,6 +151,17 @@ sandbox.CrossBorderComparator.calculate();
 const diffBadgeText = sandbox.document.getElementById('res-diff-badge').textContent;
 assert(diffBadgeText.length > 0, '跨國價差成功計算', `結果: ${diffBadgeText}`);
 
+// 測試【自訂鎖定官方比價網址 (MUJI 無印良品)】
+sandbox.CrossBorderComparator.applyPresetSite('MUJI');
+assert(sandbox.document.getElementById('cb-site-lock-badge').textContent.includes('無印良品'), '成功鎖定無印良品官網比價');
+const lockedUrls = sandbox.CrossBorderComparator.getLockedUrls(sampleProd);
+assert(lockedUrls.jpUrl.includes('muji.com'), '日本官網查價連結已鎖定為無印良品網域');
+
+// 測試【刪除查過的比價紀錄】
+sandbox.CrossBorderComparator.deleteCurrentProduct();
+assert(sandbox.CrossBorderComparator.currentProduct === null, '成功刪除目前查過的比價紀錄卡片');
+assert(!sandbox.document.getElementById('cb-empty-state').classList.contains('hidden'), '比價卡片刪除後自動返回空狀態');
+
 // ==========================================
 // 測試模組 4: 藥妝多店價格記錄與防呆
 // ==========================================

@@ -98,14 +98,51 @@
     <!-- ============================================== -->
     <section id="view-cross-border" class="space-y-4">
       
-      <!-- 快速示範與品牌按鈕 -->
-      <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200">
-        <div class="flex items-center justify-between mb-2">
+      <!-- 快速示範與品牌支援導覽 -->
+      <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200 space-y-2">
+        <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-slate-700">熱門商品快速試算：</span>
-          <span class="text-[10px] text-slate-400">點擊載入</span>
+          <button type="button" onclick="CrossBorderComparator.toggleSupportedStoresModal(true)" class="text-[11px] text-indigo-600 font-bold hover:underline flex items-center gap-0.5">
+            <span>ℹ️</span> 支援查詢哪些店家？
+          </button>
         </div>
         <div id="cb-quick-samples" class="flex space-x-2 overflow-x-auto hide-scrollbar pb-1">
           <!-- 由 JS 動態生成 -->
+        </div>
+      </div>
+
+      <!-- 🎯 自訂鎖定比價網址 (縮小範圍搜尋神器) -->
+      <div class="bg-gradient-to-r from-indigo-50 via-sky-50 to-indigo-50 rounded-xl p-3 border border-indigo-100 shadow-xs space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-base">🎯</span>
+            <span class="text-xs font-bold text-indigo-950">鎖定比價官方網站 (縮小比價範圍)</span>
+          </div>
+          <span id="cb-site-lock-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-600">未鎖定</span>
+        </div>
+        <p class="text-[11px] text-slate-600 leading-relaxed">
+          貼上您想鎖定的台日官方網址（例如無印良品、UNIQLO）。後續<b>所有掃描的條碼都會優先帶入此店家</b>進行自動比對！
+        </p>
+
+        <!-- 快速切換預設網址按鈕 -->
+        <div class="flex items-center space-x-1 overflow-x-auto hide-scrollbar pt-0.5">
+          <span class="text-[10px] text-indigo-800 font-semibold flex-shrink-0">常用網站快速鎖定:</span>
+          <button type="button" onclick="CrossBorderComparator.applyPresetSite('MUJI')" class="px-2 py-0.5 bg-white border border-indigo-200 rounded text-[10px] font-bold text-slate-700 flex-shrink-0 hover:bg-indigo-50">無印良品</button>
+          <button type="button" onclick="CrossBorderComparator.applyPresetSite('UNIQLO')" class="px-2 py-0.5 bg-white border border-indigo-200 rounded text-[10px] font-bold text-slate-700 flex-shrink-0 hover:bg-indigo-50">UNIQLO</button>
+          <button type="button" onclick="CrossBorderComparator.applyPresetSite('GU')" class="px-2 py-0.5 bg-white border border-indigo-200 rounded text-[10px] font-bold text-slate-700 flex-shrink-0 hover:bg-indigo-50">GU</button>
+          <button type="button" onclick="CrossBorderComparator.applyPresetSite('NITORI')" class="px-2 py-0.5 bg-white border border-indigo-200 rounded text-[10px] font-bold text-slate-700 flex-shrink-0 hover:bg-indigo-50">宜得利</button>
+          <button type="button" onclick="CrossBorderComparator.clearSiteLock()" class="px-2 py-0.5 bg-rose-50 border border-rose-200 rounded text-[10px] font-bold text-rose-600 flex-shrink-0 hover:bg-rose-100">清除鎖定</button>
+        </div>
+
+        <div class="space-y-1.5 pt-1">
+          <div class="flex items-center space-x-1.5">
+            <span class="text-xs flex-shrink-0">🇯🇵 日本網址:</span>
+            <input id="cb-custom-jp-url" type="url" placeholder="貼上日本官網網址 (例如 https://www.muji.com/jp/ja/store...)" class="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-300 bg-white">
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-xs flex-shrink-0">🇹🇼 台灣網址:</span>
+            <input id="cb-custom-tw-url" type="url" placeholder="貼上台灣官網網址 (例如 https://www.muji.com/tw/...)" class="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-300 bg-white">
+          </div>
         </div>
       </div>
 
@@ -123,7 +160,13 @@
         <div class="p-4 bg-slate-50/70 border-b border-slate-200 flex space-x-3 items-center">
           <img id="cb-prod-img" src="" alt="商品圖" class="w-16 h-16 rounded-lg object-cover border border-slate-200 bg-white flex-shrink-0 shadow-xs">
           <div class="flex-1 min-w-0">
-            <span id="cb-prod-brand" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 mb-1">UNIQLO</span>
+            <div class="flex items-center justify-between">
+              <span id="cb-prod-brand" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 mb-1">UNIQLO</span>
+              <!-- 刪除此條查過的比價紀錄 -->
+              <button type="button" onclick="CrossBorderComparator.deleteCurrentProduct()" class="text-xs text-rose-500 hover:text-rose-700 font-medium flex items-center gap-0.5">
+                <span>🗑️</span> 刪除此筆
+              </button>
+            </div>
             <h2 id="cb-prod-name" class="text-sm font-bold text-slate-800 truncate">商品名稱</h2>
             <p id="cb-prod-code" class="text-[11px] text-slate-500 font-mono mt-0.5">條碼: -</p>
           </div>
@@ -138,7 +181,7 @@
               <span class="text-xs font-bold text-rose-800 flex items-center">
                 <span class="mr-1">🇯🇵</span> 日本售價與店內活動
               </span>
-              <a id="cb-link-jp" href="#" target="_blank" rel="noopener noreferrer" class="text-[11px] text-rose-600 hover:underline">
+              <a id="cb-link-jp" href="#" target="_blank" rel="noopener noreferrer" class="text-[11px] text-rose-600 hover:underline font-semibold">
                 日本官網查價 ↗
               </a>
             </div>
@@ -652,6 +695,57 @@
         <button onclick="DomesticDrugComparator.closeCreateProductModal()" class="flex-1 py-2 rounded-xl border border-slate-300 text-xs text-slate-600">取消</button>
         <button onclick="DomesticDrugComparator.submitCreateProduct(document.getElementById('modal-prod-name').value, document.getElementById('modal-prod-barcode').value, document.getElementById('modal-prod-image').value)" class="flex-1 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700">建立並開始比價</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 內建支援店家與查價指南 Modal -->
+  <!-- ============================================== -->
+  <div id="supported-stores-modal" class="fixed inset-0 z-50 bg-black/75 flex flex-col items-center justify-center p-4 hidden backdrop-blur-xs">
+    <div class="bg-white rounded-2xl w-full max-w-sm max-h-[85vh] overflow-y-auto shadow-2xl p-4 space-y-3.5">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center">
+          <span class="mr-1.5">🏪</span> 內建支援查詢之店家一覽
+        </h3>
+        <button onclick="CrossBorderComparator.toggleSupportedStoresModal(false)" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-2">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-600">
+        <div>
+          <h4 class="font-bold text-indigo-700 flex items-center mb-1">
+            <span class="mr-1">🌏</span> 跨國服飾與家居品牌 (掃描/查詢)
+          </h4>
+          <ul class="space-y-1 pl-2 text-[11px] list-disc list-inside">
+            <li><strong>無印良品 (MUJI)</strong>：支援台灣官網/日本官網條碼與品項直接反查。</li>
+            <li><strong>UNIQLO (優衣庫)</strong>：支援 6 位數貨號/EAN 吊牌條碼跨國查詢。</li>
+            <li><strong>GU</strong>：支援吊牌條碼與日本/台灣官網比價。</li>
+            <li><strong>宜得利家居 (NITORI)</strong>：支援涼感寢具、收納小物台日價格比價。</li>
+          </ul>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <h4 class="font-bold text-rose-700 flex items-center mb-1">
+            <span class="mr-1">💊</span> 日本各大連鎖藥妝店 (巡店記帳與滿額試算)
+          </h4>
+          <ul class="space-y-1 pl-2 text-[11px] list-disc list-inside">
+            <li><strong>松本清 (Matsukiyo)</strong>：支援各店價格、貨架照存證、滿萬 3%/3萬 5%/5萬 7% 優惠券。</li>
+            <li><strong>唐吉訶德 (驚安殿堂 Donki)</strong>：支援各店價格、黑字含稅/紅字未稅防呆、滿萬折 5%~7%。</li>
+            <li><strong>大國藥妝 (Daikoku)</strong>：支援未稅價防呆提醒、滿 5,000 円即享額外 3% 折扣。</li>
+            <li><strong>Sundrug (尚都樂客)</strong>：支援各店記帳與連鎖階梯折價券。</li>
+            <li><strong>Bic Camera / 各大電器行</strong>：支援免稅 10% + 7% 優惠券折抵。</li>
+          </ul>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+          <p class="text-[11px] text-amber-900 leading-relaxed">
+            💡 <strong>不限上述店家！</strong> 您可以使用「🎯 鎖定比價官方網站」輸入任意品牌官網，或在藥妝比價手動輸入任意店家名稱！
+          </p>
+        </div>
+      </div>
+
+      <button onclick="CrossBorderComparator.toggleSupportedStoresModal(false)" class="w-full py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700">
+        我知道了
+      </button>
     </div>
   </div>
 

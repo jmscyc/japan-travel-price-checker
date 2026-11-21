@@ -95,22 +95,33 @@ const BarcodeScannerManager = {
     const currentTab = App.getCurrentTab();
 
     if (currentTab === "cross-border") {
-      // 搜尋預置庫
-      const product = window.SAMPLE_PRODUCTS.find(p => p.barcode === barcode || p.code === barcode);
+      const lockedBrand = localStorage.getItem("travel_locked_brand_name") || "日本品牌";
+      
+      // 搜尋預置庫（若有鎖定品牌，優先搜尋該品牌的商品）
+      let product = null;
+      if (window.SAMPLE_PRODUCTS) {
+        if (lockedBrand && lockedBrand !== "日本品牌") {
+          product = window.SAMPLE_PRODUCTS.find(p => (p.barcode === barcode || p.code === barcode) && p.brand.toLowerCase().includes(lockedBrand.toLowerCase()));
+        }
+        if (!product) {
+          product = window.SAMPLE_PRODUCTS.find(p => p.barcode === barcode || p.code === barcode);
+        }
+      }
+
       if (product) {
         CrossBorderComparator.loadProduct(product);
       } else {
-        // 未在範例庫中，建立自訂商品項目
+        // 未在預置庫中，以使用者鎖定的品牌建立即時項目
         const customProd = {
           barcode: barcode,
-          name: `商品 (條碼: ${barcode})`,
-          brand: "自訂/日本品牌",
-          image: "https://placehold.co/400x400?text=掃描商品",
+          name: `${lockedBrand} 商品 (${barcode})`,
+          brand: lockedBrand,
+          image: "https://placehold.co/400x400?text=" + encodeURIComponent(lockedBrand),
           jpPrice: 1000,
           twPrice: 350,
           jpCampaign: "請手動輸入店內標價",
           jpDiscountPrice: 1000,
-          twCampaign: "請確認台灣官網",
+          twCampaign: "請點右上角官網查價",
           twDiscountPrice: 350
         };
         CrossBorderComparator.loadProduct(customProd);
