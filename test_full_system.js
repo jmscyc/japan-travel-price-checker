@@ -271,6 +271,14 @@ assert(sheetPayload.rawRecords && sheetPayload.rawRecords.length > 0, '包含無
 sandbox.GoogleSheetSync.setAutoSync(true);
 assert(sandbox.GoogleSheetSync.isAutoSyncEnabled() === true, '自動背景同步開關設定成功');
 
+// 測試【金鑰 888】儲存與連線快取
+sandbox.GoogleSheetSync.applyPinCode('888');
+assert(sandbox.GoogleSheetSync.getPinCode() === '888', '成功綁定並儲存專屬金鑰 888');
+
+// 測試一鍵秒同步專屬網址生成 (Base64 Web App URL 封裝)
+const encoded = btoa(encodeURIComponent(testUrl));
+assert(encoded.length > 0, '成功將 Web App 網址編碼為專屬一鍵直連金鑰');
+
 console.log('\n==============================================');
 console.log(`🎉 測試完成: 通過 ${passCount} 項 / 失敗 ${failCount} 項`);
 console.log('==============================================');

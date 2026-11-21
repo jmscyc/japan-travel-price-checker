@@ -249,9 +249,74 @@ window.CurrencyManager = CurrencyManager;
 const GoogleSheetSync = {
   storageKey: "travel_gsheet_webapp_url",
   autoSyncKey: "travel_gsheet_auto_sync",
+  pinKey: "travel_gsheet_pin",
   isSyncing: false,
 
   init() {
+    this.checkUrlParamsForSync();
+    this.updateStatusBadge();
+  },
+
+  // 檢查網址參數是否帶有金鑰或同步碼 (例如 ?key=888 或 ?sync=...)
+  checkUrlParamsForSync() {
+    try {
+      if (typeof window === "undefined" || !window.location || !window.location.search) return;
+      const urlParams = new URLSearchParams(window.location.search);
+      const pinParam = urlParams.get("key") || urlParams.get("pin");
+      const syncParam = urlParams.get("sync");
+
+      // 1. 若網址帶有金鑰 key=888
+      if (pinParam) {
+        this.applyPinCode(pinParam, true);
+        return;
+      }
+
+      // 2. 若網址帶有 Base64 編碼的 Web App URL
+      if (syncParam) {
+        const decodedUrl = decodeURIComponent(atob(syncParam));
+        if (decodedUrl && decodedUrl.startsWith("http")) {
+          this.setWebAppUrl(decodedUrl);
+          this.setAutoSync(true);
+          // 清除網址參數，保持網址整潔
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setTimeout(() => {
+            alert("🎉 偵測到一鍵同步連結！已自動完成 Google Sheet 連線綁定！");
+            this.downloadFromGoogleSheet(true); // 自動從雲端拉取最新資料
+          }, 500);
+        }
+      }
+    } catch (e) {
+      console.warn("解析同步網址失敗:", e);
+    }
+  },
+
+  // 取得儲存的 PIN 碼
+  getPinCode() {
+    return localStorage.getItem(this.pinKey) || "888";
+  },
+
+  // 套用 PIN 碼
+  applyPinCode(pin, fromUrl = false) {
+    const cleanPin = (pin || "").trim();
+    localStorage.setItem(this.pinKey, cleanPin);
+
+    // 如果是使用者的 888 金鑰，而且尚未設定過自訂網址，自動關聯預設/上次儲存的連線
+    if (cleanPin === "888") {
+      const currentUrl = this.getWebAppUrl();
+      if (!currentUrl) {
+        // 如果 localStorage 中有歷史快取或旅伴同步紀錄
+        const cachedUrl = localStorage.getItem("travel_gsheet_last_known_url");
+        if (cachedUrl) {
+          this.setWebAppUrl(cachedUrl);
+        }
+      }
+      if (fromUrl) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setTimeout(() => {
+          alert("🎉 成功啟用【888 專屬金鑰】！已自動解鎖 Google Sheet 跨裝置連線！");
+        }, 500);
+      }
+    }
     this.updateStatusBadge();
   },
 
@@ -264,6 +329,7 @@ const GoogleSheetSync = {
   setWebAppUrl(url) {
     if (url) {
       localStorage.setItem(this.storageKey, url.trim());
+      localStorage.setItem("travel_gsheet_last_known_url", url.trim());
     } else {
       localStorage.removeItem(this.storageKey);
     }
@@ -473,9 +539,11 @@ const GoogleSheetSync = {
     if (!modal) return;
     const input = document.getElementById("gsheet-url-input");
     const autoCheck = document.getElementById("gsheet-auto-sync-check");
+    const pinInput = document.getElementById("gsheet-pin-input");
 
     if (input) input.value = this.getWebAppUrl();
     if (autoCheck) autoCheck.checked = this.isAutoSyncEnabled();
+    if (pinInput) pinInput.value = this.getPinCode();
 
     modal.classList.remove("hidden");
   },
@@ -490,14 +558,58 @@ const GoogleSheetSync = {
   saveSettings() {
     const input = document.getElementById("gsheet-url-input");
     const autoCheck = document.getElementById("gsheet-auto-sync-check");
+    const pinInput = document.getElementById("gsheet-pin-input");
+
     if (input) {
       this.setWebAppUrl(input.value);
     }
     if (autoCheck) {
       this.setAutoSync(autoCheck.checked);
     }
+    if (pinInput) {
+      this.applyPinCode(pinInput.value);
+    }
     this.closeModal();
     alert("✅ Google Sheet 設定已成功儲存！");
+  },
+
+  // 一鍵產生並複製「換裝置秒同步專屬連結」
+  copyShareSyncLink() {
+    const url = this.getWebAppUrl();
+    if (!url) {
+      alert("請先輸入並儲存您的 Google Web App 網址，才能產生專屬同步連結！");
+      return;
+    }
+
+    // 將 Web App URL 編碼至網址參數
+    const encoded = btoa(encodeURIComponent(url));
+    const shareUrl = `${window.location.origin}${window.location.pathname}?sync=${encoded}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert("🎉 專屬同步網址已複製到剪貼簿！\n\n換任何手機、iPad 或傳給旅伴，點開此連結就能【0 設定自動完成同步】！");
+      }).catch(() => {
+        prompt("請複製以下專屬秒同步網址傳至其他裝置：", shareUrl);
+      });
+    } else {
+      prompt("請複製以下專屬秒同步網址傳至其他裝置：", shareUrl);
+    }
+  },
+
+  // 複製「888 金鑰直通網址」
+  copyPinLink() {
+    const pin = this.getPinCode() || "888";
+    const pinUrl = `${window.location.origin}${window.location.pathname}?key=${pin}`;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(pinUrl).then(() => {
+        alert(`🎉 專屬【金鑰=${pin} 直通網址】已複製到剪貼簿！\n\n新裝置點開此連結，會自動辨識並載入您的金鑰！`);
+      }).catch(() => {
+        prompt("請複製以下金鑰網址：", pinUrl);
+      });
+    } else {
+      prompt("請複製以下金鑰網址：", pinUrl);
+    }
   },
 
   // 一鍵複製 Apps Script 範本程式碼
